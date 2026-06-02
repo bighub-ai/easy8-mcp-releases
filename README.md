@@ -35,6 +35,7 @@ A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for the
 - **Search & reporting** — cross-entity search, project reports, and dashboard data.
 - **Workspace sandboxing** — restrict local file uploads to validated directory roots.
 - **Tool allow-listing** — expose only a subset of tools via configuration.
+- **Markdown-to-HTML** — Markdown in tool arguments is automatically rendered to safe HTML for EasyProject's HTML-backed fields (descriptions, notes, comments, etc.).
 - **Shell completion generation** — built-in completions for `bash`, `zsh`, `fish`, `powershell`, and `elvish`.
 
 ## Prerequisites
@@ -93,14 +94,17 @@ The repository includes a `justfile` with common tasks:
 
 ## Configuration
 
-Configuration is loaded from four sources, in order of increasing priority:
+Configuration is loaded from multiple sources, in order of increasing priority:
 
 1. **Built-in defaults**
-2. **`config.toml`** in the working directory
-3. **Environment variables** (`EASYPROJECT_*`)
-4. **CLI arguments**
+2. **Standard per-user config file** (auto-discovered from the platform-specific config directory)
+3. **`config.toml`** in the working directory
+4. **Environment variables** (`EASYPROJECT_*`)
+5. **CLI arguments**
 
 Scalars are overridden by higher-priority sources. Arrays (e.g. `workspace_roots`) are **merged** across sources.
+
+Use `--config <PATH>` to bypass auto-discovery and load a specific config file.
 
 ### Generating a starter config file
 
@@ -128,6 +132,22 @@ workspace_roots = ["/home/user/projects", "./data"]
 # Tool allow-list. Leave empty (the default) to expose all tools.
 [tools]
 enabled = []
+
+# Markdown rendering options for HTML-backed fields.
+# When an MCP tool argument contains Markdown, it is automatically rendered
+# to HTML before being sent to the EasyProject API.
+[markdown]
+strikethrough = true
+table = true
+autolink = true
+tasklist = true
+tasklist_classes = true
+gfm_quirks = true
+# footnotes = false
+# description_lists = false
+# alerts = false
+# hardbreaks = false
+# github_pre_lang = false
 ```
 
 ### Environment variables
@@ -145,6 +165,7 @@ You can override configuration at runtime:
 
 | Flag | Description |
 |------|-------------|
+| `--config <PATH>` | Use a specific config file (disables auto-discovery) |
 | `--base-url <URL>` | Override the EasyProject base URL |
 | `--api-key <KEY>` | Override the API key |
 | `--workspace-root <PATH>` | Add a workspace root (repeatable) |
@@ -464,6 +485,7 @@ src/
 ├── api/                 # EasyProject API client and generated models
 ├── config/              # Configuration loading and structs
 ├── defaults/            # Dynamic default value resolution
+├── markdown.rs          # Markdown-to-HTML rendering (comrak + ammonia)
 ├── server/              # MCP server runtime (stdio transport)
 ├── tools/               # MCP tool implementations
 │   ├── mod.rs           # Tool router and handlers
