@@ -1,9 +1,9 @@
-# EasyProject MCP Server
+# Easy8 MCP Server
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-2024edition-orange.svg)](https://www.rust-lang.org)
 
-A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for the [EasyProject](https://www.easyproject.com) API. It exposes 50+ tools that let AI assistants manage projects, issues, users, time entries, milestones, attachments, and more directly through the MCP stdio transport.
+A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for the [Easy8](https://www.easy8.com) API. It exposes 50+ tools that let AI assistants manage projects, issues, users, time entries, milestones, attachments, and more directly through the MCP stdio transport.
 
 ## Table of Contents
 
@@ -35,46 +35,46 @@ A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for the
 - **Search & reporting** — cross-entity search, project reports, and dashboard data.
 - **Workspace sandboxing** — restrict local file uploads to validated directory roots.
 - **Tool allow-listing** — expose only a subset of tools via configuration.
-- **Markdown-to-HTML** — Markdown in tool arguments is automatically rendered to safe HTML for EasyProject's HTML-backed fields (descriptions, notes, comments, etc.).
+- **Markdown-to-HTML** — Markdown in tool arguments is automatically rendered to safe HTML for Easy8's HTML-backed fields (descriptions, notes, comments, etc.).
 - **Shell completion generation** — built-in completions for `bash`, `zsh`, `fish`, `powershell`, and `elvish`.
 
 ## Prerequisites
 
 - [Rust](https://www.rust-lang.org/tools/install) 1.85+ (the project uses the 2024 edition)
-- An active EasyProject instance
-- An EasyProject API key (generated from **My account → API access key**)
+- An active Easy8 instance
+- An Easy8 API key (generated from **My account → API access key**)
 
 ## Installation
 
 ### Build from source
 
 ```bash
-git clone https://github.com/bighub-ai/easyproject-mcp-server.git
-cd easyproject-mcp-server
+git clone https://github.com/bighub-ai/easy8-mcp-server.git
+cd easy8-mcp-server
 cargo build --release
 ```
 
 The binary is produced at:
 
 ```
-target/release/easyproject-mcp-server
+target/release/easy8-mcp
 ```
 
 ### Install via Cargo from Git
 
 ```bash
-cargo install --git https://github.com/bighub-ai/easyproject-mcp-server
+cargo install --git https://github.com/bighub-ai/easy8-mcp-server
 ```
 
 ### Pre-built binaries
 
-Pre-built binaries for macOS, Linux, and Windows are available on the [GitHub Releases](https://github.com/bighub-ai/easyproject-mcp-server/releases) page (distributed via `cargo-dist`).
+Pre-built binaries for macOS, Linux, and Windows are available on the [GitHub Releases](https://github.com/bighub-ai/easy8-mcp-server/releases) page (distributed via `cargo-dist`).
 
 ### Homebrew (macOS/Linux)
 
 ```bash
 brew tap bighub-ai/homebrew-tap
-brew install easyproject-mcp-server
+brew install easy8-mcp-server
 ```
 
 ### Using `just`
@@ -88,7 +88,7 @@ The repository includes a `justfile` with common tasks:
 | `just test` | Run tests (excludes live-server tests) |
 | `just test --live-server` | Run all tests including live-server tests |
 | `just setup` | Copy `.env.example` to `.env` |
-| `just fetch-schema` | Download the EasyProject OpenAPI schema |
+| `just fetch-schema` | Download the Easy8 OpenAPI schema |
 | `just install-hooks` | Install pre-commit hooks |
 | `just clean` | Remove generated artefacts and run `cargo clean` |
 
@@ -99,7 +99,7 @@ Configuration is loaded from multiple sources, in order of increasing priority:
 1. **Built-in defaults**
 2. **Standard per-user config file** (auto-discovered from the platform-specific config directory)
 3. **`config.toml`** in the working directory
-4. **Environment variables** (`EASYPROJECT_*`)
+4. **Environment variables** (`EASY8_*`)
 5. **CLI arguments**
 
 Scalars are overridden by higher-priority sources. Arrays (e.g. `workspace_roots`) are **merged** across sources.
@@ -111,19 +111,19 @@ Use `--config <PATH>` to bypass auto-discovery and load a specific config file.
 Run the built-in init command to generate a commented `config.toml`:
 
 ```bash
-easyproject-mcp-server config init
+easy8-mcp config init
 ```
 
 ### `config.toml` example
 
 ```toml
-[easyproject]
-base_url = "https://your-instance.easyproject.com"
+[easy8]
+base_url = "https://your-instance.easy8.com"
 api_key = "your-api-key"
 
 [http]
 timeout_seconds = 30
-# user_agent = "EasyProject-MCP-Server/0.1.0"
+# user_agent = "Easy8-MCP/0.1.0"
 
 # Local directories the server is allowed to read from for uploads.
 # Invalid or non-existent paths are skipped with a warning.
@@ -135,7 +135,7 @@ enabled = []
 
 # Markdown rendering options for HTML-backed fields.
 # When an MCP tool argument contains Markdown, it is automatically rendered
-# to HTML before being sent to the EasyProject API.
+# to HTML before being sent to the Easy8 API.
 [markdown]
 strikethrough = true
 table = true
@@ -154,10 +154,10 @@ gfm_quirks = true
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `EASYPROJECT_BASE_URL` | Root URL of your EasyProject instance | Yes* |
-| `EASYPROJECT_API_KEY` | API key for authentication | Yes* |
+| `EASY8_BASE_URL` | Root URL of your Easy8 instance | Yes* |
+| `EASY8_API_KEY` | API key for authentication | Yes* |
 
-*The server will start without them, but any tool that calls the EasyProject API will fail at runtime.
+*The server will start without them, but any tool that calls the Easy8 API will fail at runtime.
 
 ### CLI arguments
 
@@ -166,7 +166,7 @@ You can override configuration at runtime:
 | Flag | Description |
 |------|-------------|
 | `--config <PATH>` | Use a specific config file (disables auto-discovery) |
-| `--base-url <URL>` | Override the EasyProject base URL |
+| `--base-url <URL>` | Override the Easy8 base URL |
 | `--api-key <KEY>` | Override the API key |
 | `--workspace-root <PATH>` | Add a workspace root (repeatable) |
 
@@ -179,12 +179,12 @@ Create a **project-scoped** `.mcp.json` in your project root, or a **user-scoped
 ```json
 {
   "mcpServers": {
-    "easyproject": {
-      "command": "easyproject-mcp-server",
+    "easy8": {
+      "command": "easy8-mcp",
       "args": [],
       "env": {
-        "EASYPROJECT_BASE_URL": "https://your-instance.easyproject.com",
-        "EASYPROJECT_API_KEY": "your-api-key"
+        "EASY8_BASE_URL": "https://your-instance.easy8.com",
+        "EASY8_API_KEY": "your-api-key"
       }
     }
   }
@@ -195,14 +195,14 @@ If the binary is not in your `PATH`, use the absolute path:
 
 ```json
 {
-  "command": "/absolute/path/to/easyproject-mcp-server"
+  "command": "/absolute/path/to/easy8-mcp"
 }
 ```
 
 You can also add the server via the Claude Code CLI:
 
 ```bash
-claude mcp add --transport stdio easyproject -- easyproject-mcp-server
+claude mcp add --transport stdio easy8 -- easy8-mcp
 ```
 
 ### OpenCode
@@ -213,13 +213,13 @@ Create an `opencode.json` (or `opencode.jsonc`) in your project root:
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "easyproject": {
+    "easy8": {
       "type": "local",
-      "command": ["easyproject-mcp-server"],
+      "command": ["easy8-mcp"],
       "enabled": true,
       "environment": {
-        "EASYPROJECT_BASE_URL": "https://your-instance.easyproject.com",
-        "EASYPROJECT_API_KEY": "your-api-key"
+        "EASY8_BASE_URL": "https://your-instance.easy8.com",
+        "EASY8_API_KEY": "your-api-key"
       }
     }
   }
@@ -229,14 +229,14 @@ Create an `opencode.json` (or `opencode.jsonc`) in your project root:
 Use an absolute path if the binary is not globally available:
 
 ```json
-"command": ["/absolute/path/to/easyproject-mcp-server"]
+"command": ["/absolute/path/to/easy8-mcp"]
 ```
 
 Verify the connection:
 
 ```bash
 opencode mcp list
-opencode mcp debug easyproject
+opencode mcp debug easy8
 ```
 
 ### Other MCP Clients
@@ -244,7 +244,7 @@ opencode mcp debug easyproject
 Any client that supports **stdio-based MCP servers** can use the same pattern shown for Claude Code (`mcpServers` block) or OpenCode (`mcp` block). The only requirements are:
 
 - The client launches the binary as a subprocess.
-- The `EASYPROJECT_BASE_URL` and `EASYPROJECT_API_KEY` environment variables are provided (or a `config.toml` is present in the working directory).
+- The `EASY8_BASE_URL` and `EASY8_API_KEY` environment variables are provided (or a `config.toml` is present in the working directory).
 
 ## Available Tools
 
@@ -455,24 +455,24 @@ The binary supports automatic shell completion script generation via the `COMPLE
 
 ```bash
 # Bash
-COMPLETE=bash easyproject-mcp-server > /etc/bash_completion.d/easyproject-mcp-server
+COMPLETE=bash easy8-mcp > /etc/bash_completion.d/easy8-mcp
 
 # Zsh
-COMPLETE=zsh easyproject-mcp-server > /usr/local/share/zsh/site-functions/_easyproject-mcp-server
+COMPLETE=zsh easy8-mcp > /usr/local/share/zsh/site-functions/_easy8-mcp
 
 # Fish
-COMPLETE=fish easyproject-mcp-server > ~/.config/fish/completions/easyproject-mcp-server.fish
+COMPLETE=fish easy8-mcp > ~/.config/fish/completions/easy8-mcp.fish
 
 # PowerShell
-COMPLETE=powershell easyproject-mcp-server | Out-File -Encoding utf8 $PROFILE\..\Completions\easyproject-mcp-server.ps1
+COMPLETE=powershell easy8-mcp-server | Out-File -Encoding utf8 $PROFILE\..\Completions\easy8-mcp.ps1
 
 # Elvish
-COMPLETE=elvish easyproject-mcp-server > ~/.config/elvish/lib/completions/easyproject-mcp-server.elv
+COMPLETE=elvish easy8-mcp-server > ~/.config/elvish/lib/completions/easy8-mcp.elv
 ```
 
 ### Homebrew
 
-When installing via `brew install easyproject-mcp-server` from the `bighub-ai/homebrew-tap`, completions are installed automatically.
+When installing via `brew install easy8-mcp-server` from the `bighub-ai/homebrew-tap`, completions are installed automatically.
 
 ## Development
 
@@ -482,7 +482,7 @@ When installing via `brew install easyproject-mcp-server` from the `bighub-ai/ho
 src/
 ├── main.rs              # Entry point and CLI parsing
 ├── lib.rs               # Library exports
-├── api/                 # EasyProject API client and generated models
+├── api/                 # Easy8 API client and generated models
 ├── config/              # Configuration loading and structs
 ├── defaults/            # Dynamic default value resolution
 ├── markdown.rs          # Markdown-to-HTML rendering (comrak + ammonia)
@@ -522,20 +522,20 @@ The server writes structured logs to **stderr**. Because MCP stdio transport use
 
 ### "Unauthorized" or 401 errors
 
-- Verify that `EASYPROJECT_API_KEY` is correct.
+- Verify that `EASY8_API_KEY` is correct.
 - Ensure the API key has not expired (regenerate it from **My account → API access key**).
 - Confirm the user associated with the key has sufficient permissions.
 
 ### "Connection refused" or timeout errors
 
-- Verify that `EASYPROJECT_BASE_URL` is reachable from the machine running the server.
+- Verify that `EASY8_BASE_URL` is reachable from the machine running the server.
 - Ensure the URL includes the scheme (`https://`) and has no trailing path.
 - Check firewall or proxy settings.
 
 ### Tools not appearing in the client
 
 - Check that the server started without errors (inspect stderr output).
-- Verify the `EASYPROJECT_BASE_URL` and `EASYPROJECT_API_KEY` are set.
+- Verify the `EASY8_BASE_URL` and `EASY8_API_KEY` are set.
 - If you configured `[tools] enabled = [...]`, ensure the desired tool names are spelled exactly as listed above.
 
 ### Local file upload fails
