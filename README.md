@@ -68,13 +68,12 @@ cargo install --git https://github.com/bighub-ai/easy8-mcp-server
 
 ### Pre-built binaries
 
-Pre-built binaries for macOS, Linux, and Windows are available on the [GitHub Releases](https://github.com/bighub-ai/easy8-mcp-server/releases) page (distributed via `cargo-dist`).
+Pre-built binaries for macOS, Linux, and Windows are available on the [GitHub Releases](https://github.com/bighub-ai/easy8-mcp-releases/releases) page (distributed via `cargo-dist`).
 
 ### Homebrew (macOS/Linux)
 
 ```bash
-brew tap bighub-ai/homebrew-tap
-brew install easy8-mcp-server
+brew install bighub-ai/tap/easy8-mcp-server
 ```
 
 ### Using `just`
