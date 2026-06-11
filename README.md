@@ -8,6 +8,7 @@ A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for the
 ## Table of Contents
 
 - [Features](#features)
+- [Smart Defaults](#smart-defaults)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Configuration](#configuration)
@@ -35,8 +36,25 @@ A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for the
 - **Search & reporting** — cross-entity search, project reports, and dashboard data.
 - **Workspace sandboxing** — restrict local file uploads to validated directory roots.
 - **Tool allow-listing** — expose only a subset of tools via configuration.
+- **Smart defaults** — runtime defaults (e.g. `author_id` resolved from the current API user) and sticky defaults (last-used values remembered across tool calls) so you don't have to repeat yourself.
 - **Markdown-to-HTML** — Markdown in tool arguments is automatically rendered to safe HTML for Easy8's HTML-backed fields (descriptions, notes, comments, etc.).
 - **Shell completion generation** — built-in completions for `bash`, `zsh`, `fish`, `powershell`, and `elvish`.
+
+## Smart Defaults
+
+When optional parameters are omitted, the server automatically resolves sensible defaults so you don't have to specify the same values repeatedly:
+
+- **Runtime defaults** — `author_id` defaults to the currently authenticated Easy8 user (fetched once per 5-minute TTL window).
+- **Sticky defaults** — last-used values for `project_id`, `tracker_id`, `status_id`, and `author_id` are remembered across tool calls. For example, after listing issues for project `42`, a subsequent `create_issue` without an explicit `project_id` will automatically target project `42`.
+
+Resolution order is strict: **explicit value > sticky default > runtime dynamic default > hardcoded fallback**.
+
+| Field | Tools | Default source |
+|-------|-------|----------------|
+| `author_id` | `create_project`, `update_project` | current user (runtime) |
+| `tracker_id` | `create_issue`, `update_issue`, `list_issues` | last-used (sticky) |
+| `status_id` | `create_issue`, `update_issue`, `complete_issue`, `list_issues` | last-used (sticky) |
+| `project_id` | `list_issues` | last-used (sticky) |
 
 ## Prerequisites
 
